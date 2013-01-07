@@ -2,9 +2,9 @@ class Manga
   
   attr_accessor :id, :name, :chapters
 
-  def initialize(data)
-    @id = data[:id]
-    @name = data[:name]
-  end
 
+
+  def get_human_name
+    name.gsub(/-/," ")
+  end
 end

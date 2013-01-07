@@ -20,4 +20,9 @@ class Provider
       end
     end
   end
+
+  private
+
+  def get_series_url
+  end
 end
