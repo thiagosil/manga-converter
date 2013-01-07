@@ -1,3 +1,6 @@
+require 'nokogiri'
+require 'open-uri'
+
 class Provider
   
   attr_accessor :base_url, :mangas
