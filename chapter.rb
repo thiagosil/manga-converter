@@ -1,7 +1,3 @@
 class Chapter
-  attr_accessor :pages, :manga
-
-  def initialize()
-
-  end
+  attr_accessor :id,:pages, :manga, :number
 end

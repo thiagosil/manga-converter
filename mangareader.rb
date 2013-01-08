@@ -1,15 +1,18 @@
 require './provider'
 require './manga'
+require './chapter'
 
 class Mangareader < Provider
 
   attr_accessor :mangas, :chapters, :pages
   
-  BASE_URL = 'http://www.mangareader.net'
-  ALPHABETICAL_URL = 'http://www.mangareader.net/alphabetical'
+  
 
   def initialize
-    @old_series_url_regex = /\/(?<series_id>\d{1,3})\/(?<series_name>(\w+-?\w?)+)/
+    @BASE_URL = 'http://www.mangareader.net'
+    @ALPHABETICAL_URL = 'http://www.mangareader.net/alphabetical'
+
+    @old_series_url_regex = /\/(?<series_id>\d+)\/(?<series_name>(\w+-?\w?)+)/
     @new_series_url_regex = /(?<series_name>(\w+-?\w?)+)/
 
     @chapter_regex_1 = /\/(?<series_id>\d+)-(?<chapter_id>\d+)-1\/(?<series>(\w+-?\w?)+)\/chapter-(?<chapter>\d+).html/
@@ -19,7 +22,7 @@ class Mangareader < Provider
   def populate_series_list
     @mangas = Hash.new
 
-    doc = Nokogiri::HTML(open(ALPHABETICAL_URL))
+    doc = Nokogiri::HTML(open(@ALPHABETICAL_URL))
 
     doc.css("ul.series_alpha a").each do |link|
       manga = Manga.new
@@ -28,7 +31,7 @@ class Mangareader < Provider
       match = @old_series_url_regex.match(url)
 
       if match
-        manga.id   = match[:series_id]
+        manga.id   = match[:series_id].to_i
         manga.name = match[:series_name]
       else
         match = @new_series_url_regex.match(url)
@@ -36,42 +39,40 @@ class Mangareader < Provider
           manga.name = match[:series_name]
         end
       end
-      mangas[manga.name] = manga
+      @mangas[manga.name] = manga
     end
   end
 
   def populate_chapters_list(manga_name)
     @chapters = Hash.new
-    manga_url = @mangas[manga_name]
     
-    doc = Nokogiri::HTML(open(BASE_URL + manga_url))
+    manga = @mangas[manga_name]
+    manga_url = get_series_url(@mangas[manga_name])
+
+    doc = Nokogiri::HTML(open(manga_url))
     
     doc.xpath("//table[@id='listing']/tr[position()>1]").each do |n|
       url = n.xpath("td[1]/a")[0]['href']
-
+      chapter = Chapter.new
       #compare to old chapter naming
       match = @chapter_regex_1.match(url)
       if match
-        chapter = Chapter.new
-
-        chapter.series_id = match[:series_id]
-        chapter.id = match[:chapter_id]
-        chapter.series = match[:series]
-        chapter.number = match[:chapter]
-        @chapters[match[4].to_i] = url
+        
+        chapter.id = match[:chapter_id].to_i
+        chapter.number = match[:chapter].to_i
       end
 
       #compare to new chapter naming
       match = @chapter_regex_2.match(url)
       if match
-        @chapters[match[1].to_i] = url
+        chapter.number = match[:chapter].to_i
       end
-      
+      @chapters[chapter.number] = chapter
     end
   end
 
   def list_mangas
-    @mangas.each_key
+    @mangas.each_key {|key| puts key }
   end
 
   def list_chapters
@@ -101,17 +102,17 @@ class Mangareader < Provider
 
   def get_series_url(manga)
     if manga.id
-      "#{baseurl}/#{manga.id}/#{manga.name}.html"
+      "#{@BASE_URL}/#{manga.id}/#{manga.name}.html"
     else
-      "#{baseurl}/#{manga.name}"
+      "#{@BASE_URL}/#{manga.name}"
     end
   end
 
   def get_page_url(page)
     if page.chapter.id
-      "#{baseurl}/#{manga.id}-#{chapter.id}-#{page}/#{manga.name}/chapter-#{chapter.id}.html"
+      "#{@BASE_URL}/#{manga.id}-#{chapter.id}-#{page}/#{manga.name}/chapter-#{chapter.id}.html"
     else
-      "#{baseurl}/#{manga.id}/#{chapter.id}/#{page}"
+      "#{@BASE_URL}/#{manga.id}/#{chapter.id}/#{page}"
     end
   end
 
