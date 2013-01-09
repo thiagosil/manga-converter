@@ -72,11 +72,21 @@ class Mangareader < Provider
   end
 
   def list_mangas
-    @mangas.each_key {|key| puts key }
+    if @mangas
+      @mangas.values
+    else
+      populate_series_list
+      @mangas.values
+    end
   end
 
-  def list_chapters
-    @chapters.each_key
+  def list_chapters(manga_name)
+    if @chapters
+      @chapters.values
+    else
+      populate_chapters_list(manga_name)
+      @chapters.values
+    end
   end
 
   def populate_manga_pages(chapter_number)

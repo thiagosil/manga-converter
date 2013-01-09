@@ -1,0 +1,9 @@
+%link{:rel =>"stylesheet", :href => "css/bootstrap.css"}
+
+%table{:class => "table table-bordered table-hover"}
+  %tbody
+    - @mangas.each do |manga|
+      %tr
+        %td 
+          %a{:id => manga.name, :href => "/mangas/#{manga.name}"}= manga.get_human_name
+  
