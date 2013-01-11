@@ -2,6 +2,8 @@ require 'sinatra'
 require 'haml'
 require_relative 'mangareader'
 
+#moofle
+
 get '/' do
   manga_list
   haml :select_manga

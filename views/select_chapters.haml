@@ -1,7 +1,8 @@
 %h1 select chapters
-- @chapters.each do |chapter|
-  %input{:type => :checkbox, :id => chapter.number}= chapter.number
-  %br
-
+%ul
+  - @chapters.each do |chapter|
+    %li
+      %input{:type => :checkbox, :id => chapter.number}= chapter.number
+    
 %div
   %input{:type => :button, :id => "download_button", :value => :download}
