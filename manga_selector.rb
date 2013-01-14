@@ -6,7 +6,7 @@ require_relative 'mangareader'
 
 get '/' do
   manga_list
-  haml :select_manga
+  haml :select_manga, :format => :html5 
 end
 
 get '/mangas/:manga_name' do
@@ -16,6 +16,9 @@ get '/mangas/:manga_name' do
   haml :select_chapters
 end
 
+get '/main' do
+  haml :index
+end
 
 private
 
