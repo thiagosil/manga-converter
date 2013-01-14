@@ -13,7 +13,7 @@ get '/mangas/:manga_name' do
   @mr = Mangareader.new
   @mangas = @mr.list_mangas
   @chapters = @mr.list_chapters(params[:manga_name])
-  haml :select_chapters
+  haml :select_chapters, :format => :html5 
 end
 
 get '/main' do
